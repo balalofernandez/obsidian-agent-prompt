@@ -43,8 +43,21 @@ export interface AgentRunner {
   id: string;
   displayName: string;
   defaultBinary: string;
-  /** Default value for the "allowed tools" setting. */
+  /** Default value for the "allowed tools" setting. Empty if the CLI has no such concept. */
   defaultAllowedTools: string;
+  /** Official docs for the headless / non-interactive mode. */
+  docsUrl: string;
+  /**
+   * How well the CLI can be confined to the vault, shown in settings.
+   * "vault": tools verified to be limited to the vault folder.
+   * "partial": some restriction (e.g. no shell) but not verified to the vault.
+   * "none": the agent runs with your user's full permissions.
+   */
+  isolation: "vault" | "partial" | "none";
+  /** One sentence shown under the agent dropdown explaining `isolation`. */
+  safetyNote: string;
+  /** True once someone ran this runner end to end against the real CLI. */
+  verified: boolean;
   buildInvocation(req: AgentRequest, cfg: AgentConfig): AgentInvocation;
   /** Args used by the "Test agent" button (e.g. --version). */
   versionArgs(): string[];

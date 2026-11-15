@@ -21,3 +21,4 @@
 .agent-prompt-status-running {
   color: var(--text-accent);
 }
+.agent-prompt-safety { margin: 0 0 12px; }

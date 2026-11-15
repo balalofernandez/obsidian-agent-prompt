@@ -10,6 +10,10 @@ export class ClaudeCodeAgent implements AgentRunner {
   displayName = "Claude Code";
   defaultBinary = "claude";
   defaultAllowedTools = "Read,Write,Edit,MultiEdit,Glob,Grep,LS";
+  docsUrl = "https://docs.claude.com/en/docs/claude-code/cli-reference";
+  isolation = "vault" as const;
+  safetyNote = "File tools only, pre-approved inside the vault; -p mode denies everything else.";
+  verified = true;
 
   buildInvocation(req: AgentRequest, cfg: AgentConfig): AgentInvocation {
     const args = [

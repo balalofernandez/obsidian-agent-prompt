@@ -64,7 +64,7 @@ export class AgentPromptSettingTab extends PluginSettingTab {
       .setName("CLI agent")
       .setDesc("Command-line agent that runs the task inside the vault folder.")
       .addDropdown((d) => {
-        for (const a of AGENTS) d.addOption(a.id, a.displayName);
+        for (const a of AGENTS) d.addOption(a.id, a.displayName + (a.verified ? "" : " (beta)"));
         d.setValue(s.agentId).onChange(async (v) => {
           s.agentId = v;
           await this.plugin.saveSettings();
@@ -74,6 +74,10 @@ export class AgentPromptSettingTab extends PluginSettingTab {
 
     const runner = getAgent(s.agentId);
     const entry = agentEntry(s, s.agentId);
+    const badge = { vault: "🔒 Limited to the vault", partial: "⚠️ Partially restricted", none: "⚠️ Full user permissions" }[runner.isolation];
+    const info = containerEl.createDiv({ cls: "setting-item-description agent-prompt-safety" });
+    info.createSpan({ text: `${badge}${runner.verified ? "" : " · not tested end to end yet"}. ${runner.safetyNote} ` });
+    info.createEl("a", { text: "Docs", href: runner.docsUrl });
 
     new Setting(containerEl)
       .setName("Executable")
