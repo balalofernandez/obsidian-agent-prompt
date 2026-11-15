@@ -1,9 +1,9 @@
 {
   "id": "agent-prompt",
   "name": "Agent Prompt",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "minAppVersion": "1.4.0",
-  "description": "Select text, press a hotkey, type a prompt and let a CLI agent (Claude Code) edit your vault in the background.",
+  "description": "Select text, press a hotkey, type a prompt and let a CLI coding agent (Claude Code, Codex, Gemini CLI...) edit your vault in the background.",
   "author": "balalofernandez",
   "authorUrl": "https://github.com/balalofernandez",
   "isDesktopOnly": true

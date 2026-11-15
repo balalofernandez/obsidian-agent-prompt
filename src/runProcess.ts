@@ -1,4 +1,7 @@
-import { spawn, ChildProcess } from "child_process";
+import { ChildProcess } from "child_process";
+// cross-spawn resolves .cmd/.bat shims on Windows and escapes arguments for cmd.exe,
+// so multi-line prompts passed as arguments survive. On macOS/Linux it is plain spawn.
+import spawn from "cross-spawn";
 import * as os from "os";
 import * as path from "path";
 
@@ -55,7 +58,7 @@ export function runProcess(opts: {
         cwd: opts.cwd,
         env: { ...process.env, PATH: augmentedPath(), ...opts.env },
         stdio: ["pipe", "pipe", "pipe"],
-        shell: process.platform === "win32",
+        windowsHide: true,
       });
     } catch (e) {
       resolve({ stdout, stderr: String(e), exitCode: null, timedOut, cancelled });

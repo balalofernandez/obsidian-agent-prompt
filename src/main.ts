@@ -4,7 +4,8 @@ import { buildUserPrompt, EditorContext } from "./context";
 import { buildSystemPrompt } from "./prompt";
 import { PromptModal } from "./PromptModal";
 import { RunningProcess, runProcess } from "./runProcess";
-import { AgentPromptSettings, AgentPromptSettingTab, agentEntry, DEFAULT_SETTINGS } from "./settings";
+import { AgentPromptSettings, AgentPromptSettingTab, agentEntry, DEFAULT_SETTINGS, detectInstalled } from "./settings";
+import { AGENTS } from "./agents/registry";
 
 export default class AgentPromptPlugin extends Plugin {
   settings!: AgentPromptSettings;
@@ -35,6 +36,26 @@ export default class AgentPromptPlugin extends Plugin {
     });
 
     this.addSettingTab(new AgentPromptSettingTab(this.app, this));
+    this.app.workspace.onLayoutReady(() => void this.chooseDefaultAgent());
+  }
+
+  /** First run: pick an installed agent (registry order) and tell the user. */
+  private async chooseDefaultAgent(): Promise<void> {
+    if (this.settings.agentChosen) return;
+    const installed = detectInstalled(this.settings);
+    const pick = AGENTS.find((a) => installed.has(a.id));
+    if (!pick) {
+      new Notice("Agent Prompt: no supported agent CLI found. Install one (e.g. Claude Code) or set its path in the plugin settings.", 15000);
+      return;
+    }
+    this.settings.agentId = pick.id;
+    this.settings.agentChosen = true;
+    await this.saveSettings();
+    const others = AGENTS.filter((a) => a !== pick && installed.has(a.id)).map((a) => a.displayName);
+    new Notice(
+      `Agent Prompt: using ${pick.displayName}.` + (others.length ? ` Also found: ${others.join(", ")}. Change it in the plugin settings.` : ""),
+      10000,
+    );
   }
 
   onunload(): void {

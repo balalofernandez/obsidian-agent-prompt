@@ -1,6 +1,7 @@
 import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 import { AGENTS, DEFAULT_AGENT_ID, getAgent } from "./agents/registry";
 import { runProcess } from "./runProcess";
+import { findBinary } from "./detect";
 import type AgentPromptPlugin from "./main";
 
 export interface AgentSettingsEntry {
@@ -17,6 +18,8 @@ export interface AgentPromptSettings {
   timeoutSeconds: number;
   extraInstructions: string;
   showResultNotice: boolean;
+  /** Set once the plugin picked a default agent from the installed ones. */
+  agentChosen: boolean;
 }
 
 export const DEFAULT_SETTINGS: AgentPromptSettings = {
@@ -25,7 +28,18 @@ export const DEFAULT_SETTINGS: AgentPromptSettings = {
   timeoutSeconds: 300,
   extraInstructions: "",
   showResultNotice: true,
+  agentChosen: false,
 };
+
+/** Agents whose configured (or default) executable exists on this machine. */
+export function detectInstalled(settings: AgentPromptSettings): Set<string> {
+  const found = new Set<string>();
+  for (const a of AGENTS) {
+    const bin = settings.agents[a.id]?.binary.trim() || a.defaultBinary;
+    if (findBinary(bin)) found.add(a.id);
+  }
+  return found;
+}
 
 export function agentEntry(settings: AgentPromptSettings, agentId: string): AgentSettingsEntry {
   const runner = getAgent(agentId);
@@ -62,9 +76,12 @@ export class AgentPromptSettingTab extends PluginSettingTab {
     new Setting(containerEl).setName("Agent").setHeading();
     new Setting(containerEl)
       .setName("CLI agent")
-      .setDesc("Command-line agent that runs the task inside the vault folder.")
+      .setDesc("Command-line agent that runs the task inside the vault folder. Agents found on this computer are listed first.")
       .addDropdown((d) => {
-        for (const a of AGENTS) d.addOption(a.id, a.displayName + (a.verified ? "" : " (beta)"));
+        const installed = detectInstalled(s);
+        const label = (a: (typeof AGENTS)[number]) => a.displayName + (a.verified ? "" : " (beta)");
+        for (const a of AGENTS) if (installed.has(a.id)) d.addOption(a.id, `✓ ${label(a)}`);
+        for (const a of AGENTS) if (!installed.has(a.id)) d.addOption(a.id, `${label(a)} (not found)`);
         d.setValue(s.agentId).onChange(async (v) => {
           s.agentId = v;
           await this.plugin.saveSettings();

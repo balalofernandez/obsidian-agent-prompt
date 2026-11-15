@@ -101,6 +101,14 @@ check(loaded, "plugin loaded in Obsidian");
 const hotkey = await page.evaluate(() => JSON.stringify(window.app.commands.commands["agent-prompt:run"]?.hotkeys));
 check(hotkey?.includes('"j"'), `default hotkey registered (${hotkey})`);
 
+const chosen = await page.evaluate(() => {
+  const s = window.app.plugins.plugins["agent-prompt"].settings;
+  return { agentChosen: s.agentChosen, agentId: s.agentId };
+});
+check(chosen.agentChosen && chosen.agentId === "claude-code", `first run picked an installed agent (${JSON.stringify(chosen)})`);
+const notice = await page.locator(".notice").allInnerTexts();
+check(notice.some((t) => t.includes("using Claude Code")), `first-run notice shown: ${notice.join(" | ").slice(0, 160)}`);
+
 async function openNote(file) {
   await page.evaluate(async (f) => {
     const leaf = window.app.workspace.getLeaf(false);
