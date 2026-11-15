@@ -12,8 +12,11 @@ describe("ClaudeCodeAgent", () => {
     const inv = a.buildInvocation(req, cfg);
     expect(inv.command).toBe("claude");
     expect(inv.args).toContain("-p");
-    expect(inv.args).toContain("--allowedTools=Read,Edit");
-    expect(inv.args.slice(inv.args.indexOf("--permission-mode"), inv.args.indexOf("--permission-mode") + 2)).toEqual(["--permission-mode", "acceptEdits"]);
+    const t = inv.args.indexOf("--tools");
+    expect(inv.args.slice(t, t + 3)).toEqual(["--tools", "Read", "Edit"]);
+    const a2 = inv.args.indexOf("--allowedTools");
+    expect(inv.args.slice(a2, a2 + 3)).toEqual(["--allowedTools", "Read(./**)", "Edit(./**)"]);
+    expect(inv.args).not.toContain("--permission-mode");
     expect(inv.args[inv.args.indexOf("--append-system-prompt") + 1]).toBe("SYS");
     expect(inv.stdin).toBe("do it");
     expect(inv.args).not.toContain("do it");

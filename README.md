@@ -19,12 +19,19 @@ If you select nothing, the instruction applies to the whole note, with focus on 
 The plugin runs this command:
 
 ```
-claude -p --output-format json --permission-mode acceptEdits \
+claude -p --output-format json \
        --append-system-prompt "<obsidian rules>" \
-       --allowedTools=Read,Write,Edit,MultiEdit,Glob,Grep,LS   < task-on-stdin
+       --tools Read Write Edit MultiEdit Glob Grep LS \
+       --allowedTools "Read(./**)" "Edit(./**)" "Write(./**)" ...   < task-on-stdin
 ```
 
-The default tool list leaves out `Bash`, so the agent can only read and edit files in your vault.
+`--tools` decides which tools exist: no `Bash`, no web access. `--allowedTools` approves them only for paths inside your vault. Claude Code denies anything outside the vault, because nobody can approve a prompt in `-p` mode.
+
+## Privacy and safety
+
+- Each run sends your instruction, the selected text, the note path and any note the agent decides to read to Anthropic, through your own Claude Code account.
+- The agent writes changes without asking you. Cancel stops the process, but files it already wrote stay written. Use git or Obsidian's File recovery core plugin if you want to roll back.
+- The permission rules above come from Claude Code, not from the operating system. The `claude` process runs as your user. If you add tools, widen the rules in Extra arguments or point the plugin at another agent, you lose that limit.
 
 ## Install
 
@@ -61,7 +68,7 @@ Change the hotkey in Settings → Hotkeys, or use the button in the plugin setti
 
 - CLI agent: the backend to use. Claude Code is the only option for now.
 - Executable: `claude` or an absolute path. Apps launched from a dock don't get your shell `PATH`, so the plugin adds `~/.local/bin`, `~/.claude/local`, `/usr/local/bin`, `/opt/homebrew/bin` and a few others. The Test button runs `--version`.
-- Model, allowed tools, extra arguments: one set per agent.
+- Model, allowed tools, extra arguments: one set per agent. Each name in Allowed tools gets the `(./**)` vault scope unless you write your own rule, such as `Read(~/Templates/**)`.
 - Timeout, extra instructions (appended to the system prompt), result notification on/off.
 
 ## Adding another agent (Codex, Gemini CLI, ...)

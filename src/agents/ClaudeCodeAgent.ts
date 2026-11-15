@@ -15,11 +15,16 @@ export class ClaudeCodeAgent implements AgentRunner {
     const args = [
       "-p",
       "--output-format", "json",
-      "--permission-mode", "acceptEdits",
       "--append-system-prompt", req.systemPrompt,
     ];
-    const tools = cfg.allowedTools.trim();
-    if (tools) args.push(`--allowedTools=${tools}`);
+    // `--tools` limits which tools exist at all (no Bash, no web).
+    // `--allowedTools Tool(./**)` pre-approves them only for paths inside the
+    // vault (cwd). Anything else needs approval, which `-p` mode denies.
+    const tools = cfg.allowedTools.split(/[\s,]+/).filter(Boolean);
+    if (tools.length) {
+      args.push("--tools", ...tools);
+      args.push("--allowedTools", ...tools.map((t) => (t.includes("(") ? t : `${t}(./**)`)));
+    }
     if (cfg.model.trim()) args.push("--model", cfg.model.trim());
     args.push(...splitArgs(cfg.extraArgs));
     return {
