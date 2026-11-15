@@ -1,6 +1,6 @@
 {
   "name": "obsidian-agent-prompt",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Obsidian plugin: select text, press a hotkey, type a prompt and let a CLI coding agent (Claude Code) edit your vault in the background.",
   "main": "main.js",
   "scripts": {
