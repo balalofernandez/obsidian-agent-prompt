@@ -1,0 +1,28 @@
+{
+  "name": "obsidian-agent-prompt",
+  "version": "0.1.0",
+  "description": "Obsidian plugin: select text, press a hotkey, type a prompt and let a CLI coding agent (Claude Code) edit your vault in the background.",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "test": "vitest run",
+    "e2e": "node test/e2e/run.mjs"
+  },
+  "keywords": [
+    "obsidian",
+    "plugin",
+    "claude",
+    "agent"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "builtin-modules": "^5.5.0",
+    "esbuild": "^0.28.2",
+    "obsidian": "^1.14.4",
+    "playwright-core": "^1.65.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}

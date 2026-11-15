@@ -1,0 +1,23 @@
+.agent-prompt-modal .agent-prompt-context {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  max-height: 6em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.agent-prompt-modal textarea {
+  width: 100%;
+  min-height: 90px;
+  resize: vertical;
+  font-family: var(--font-text);
+}
+.agent-prompt-modal .agent-prompt-hint {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+  margin-top: 6px;
+}
+.agent-prompt-status-running {
+  color: var(--text-accent);
+}
